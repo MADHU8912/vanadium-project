@@ -5,7 +5,14 @@ pipeline {
 
         stage('Clone') {
             steps {
-                git 'https://github.com/MADHU8912/vanadium-project.git'
+                git branch: 'main',
+                url: 'https://github.com/MADHU8912/vanadium-project.git'
+            }
+        }
+
+        stage('Remove Old Container') {
+            steps {
+                bat 'docker rm -f vanadium-container || exit 0'
             }
         }
 
