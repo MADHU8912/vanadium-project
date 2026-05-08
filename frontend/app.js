@@ -1,18 +1,26 @@
 async function checkBackend(){
 
-  try{
+    try{
 
-    const response = await fetch("http://localhost:5001");
+        const response =
+            await fetch("http://localhost:5000/api/status");
 
-    const data = await response.text();
+        const data = await response.json();
 
-    document.getElementById("result").innerText = data;
+        document.getElementById("result").innerHTML = `
 
-  }catch(error){
+            Backend: ${data.backend}<br>
+            Docker: ${data.docker}<br>
+            Jenkins: ${data.jenkins}<br>
+            GitHub Actions: ${data.githubActions}
 
-    document.getElementById("result").innerText =
-      "Backend Not Running";
+        `;
 
-  }
+    }catch(error){
+
+        document.getElementById("result").innerText =
+            "Backend Not Running";
+
+    }
 
 }
