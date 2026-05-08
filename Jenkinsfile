@@ -25,7 +25,7 @@ pipeline {
 
         }
 
-        stage('Docker Pull Old Image') {
+        stage('Docker Pull') {
 
             steps {
 
@@ -110,6 +110,16 @@ pipeline {
             steps {
 
                 bat 'docker push %DOCKER_HUB%/%IMAGE_NAME%'
+
+            }
+
+        }
+
+        stage('Deploy To Render') {
+
+            steps {
+
+                bat 'curl -X POST https://api.render.com/deploy/srv-d7up1t50lvsc7382pmog?key=jzIAaV4S3io'
 
             }
 
