@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
 });
 
 
-// Status Route
+// Monitoring Status Route
 
 app.get("/api/status", (req, res) => {
 
@@ -30,6 +30,18 @@ app.get("/api/status", (req, res) => {
         jenkins: "Connected",
 
         githubActions: "Working"
+
+    });
+
+});
+
+
+
+app.get("/health", (req, res) => {
+
+    res.status(200).json({
+
+        status: "OK"
 
     });
 
