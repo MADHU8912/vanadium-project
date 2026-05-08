@@ -5,7 +5,7 @@ pipeline {
 
         stage('Clone') {
             steps {
-                git 'YOUR_GITHUB_REPO_URL'
+                git 'https://github.com/MADHU8912/vanadium-project.git'
             }
         }
 
@@ -17,7 +17,7 @@ pipeline {
 
         stage('Run Docker Container') {
             steps {
-                bat 'docker run -d -p 5000:5000 vanadium-app'
+                bat 'docker run -d -p 5001:5000 --name vanadium-container vanadium-app'
             }
         }
 
