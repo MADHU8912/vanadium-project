@@ -3,7 +3,7 @@ async function checkBackend(){
     try{
 
         const response =
-            await fetch("http://localhost:5000/api/status");
+            await fetch("https://vanadium-backend.onrender.com/api/status");
 
         const data = await response.json();
 
