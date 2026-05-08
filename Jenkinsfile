@@ -8,7 +8,7 @@ pipeline {
 
         CONTAINER_NAME = "vanadium-backend-container"
 
-        PORT = "5000"
+        DOCKER_HUB = "nikhilabba12"
 
     }
 
@@ -55,6 +55,26 @@ pipeline {
 
         }
 
+        stage('Docker Logs') {
+
+            steps {
+
+                bat 'docker logs %CONTAINER_NAME%'
+
+            }
+
+        }
+
+        stage('Docker Copy') {
+
+            steps {
+
+                bat 'docker cp %CONTAINER_NAME%:/app/server.js server-copy.js'
+
+            }
+
+        }
+
         stage('Health Check') {
 
             steps {
@@ -65,11 +85,21 @@ pipeline {
 
         }
 
-        stage('Docker Logs') {
+        stage('Docker Tag') {
 
             steps {
 
-                bat 'docker logs %CONTAINER_NAME%'
+                bat 'docker tag %IMAGE_NAME% %DOCKER_HUB%/%IMAGE_NAME%'
+
+            }
+
+        }
+
+        stage('Docker Push') {
+
+            steps {
+
+                bat 'docker push %DOCKER_HUB%/%IMAGE_NAME%'
 
             }
 
