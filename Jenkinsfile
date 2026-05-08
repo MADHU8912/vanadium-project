@@ -25,6 +25,16 @@ pipeline {
 
         }
 
+        stage('Docker Pull Old Image') {
+
+            steps {
+
+                bat 'docker pull %DOCKER_HUB%/%IMAGE_NAME% || exit 0'
+
+            }
+
+        }
+
         stage('Remove Old Container') {
 
             steps {
