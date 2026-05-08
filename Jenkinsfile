@@ -2,59 +2,93 @@ pipeline {
 
     agent any
 
+    environment {
+
+        IMAGE_NAME = "vanadium-backend"
+
+        CONTAINER_NAME = "vanadium-backend-container"
+
+        PORT = "5000"
+
+    }
+
     stages {
 
         stage('Clone Repository') {
+
             steps {
 
                 git branch: 'main',
                 url: 'https://github.com/MADHU8912/vanadium-project.git'
 
             }
+
         }
 
-        stage('Remove Old Containers') {
+        stage('Remove Old Container') {
+
             steps {
 
-                bat 'docker rm -f vanadium-backend-container || exit 0'
-                bat 'docker rm -f vanadium-frontend-container || exit 0'
-                bat 'docker rm -f vanadium-container || exit 0'
-                bat 'docker rm -f vanadium-project-backend-1 || exit 0'
-                bat 'docker rm -f vanadium-project-frontend-1 || exit 0'
+                bat 'docker rm -f %CONTAINER_NAME% || exit 0'
 
             }
+
         }
 
-        stage('Build Backend Image') {
+        stage('Build Docker Image') {
+
             steps {
 
-                bat 'docker build -t vanadium-backend ./backend'
+                bat 'docker build -t %IMAGE_NAME% ./backend'
 
             }
+
         }
 
-        stage('Build Frontend Image') {
+        stage('Run Docker Container') {
+
             steps {
 
-                bat 'docker build -t vanadium-frontend ./frontend'
+                bat 'docker run -d -p 5000:5000 --name %CONTAINER_NAME% %IMAGE_NAME%'
 
             }
+
         }
 
-        stage('Run Backend Container') {
+        stage('Health Check') {
+
             steps {
 
-                bat 'docker run -d -p 6000:5000 --name vanadium-backend-container vanadium-backend'
+                bat 'curl http://localhost:5000/health'
 
             }
+
         }
 
-        stage('Run Frontend Container') {
+        stage('Docker Logs') {
+
             steps {
 
-                bat 'docker run -d -p 3001:80 --name vanadium-frontend-container vanadium-frontend'
+                bat 'docker logs %CONTAINER_NAME%'
 
             }
+
+        }
+
+    }
+
+    post {
+
+        success {
+
+            echo '✅ Pipeline completed successfully'
+
+        }
+
+        failure {
+
+            echo '❌ Pipeline failed'
+
         }
 
     }
