@@ -4,11 +4,9 @@ pipeline {
 
     environment {
 
-        IMAGE_NAME = "vanadium-backend"
+        BACKEND_IMAGE = "nikhilabba12/vanadium-backend"
 
-        CONTAINER_NAME = "vanadium-backend-container"
-
-        DOCKER_HUB = "nikhilabba12"
+        BACKEND_CONTAINER = "vanadium-backend"
 
     }
 
@@ -25,41 +23,79 @@ pipeline {
 
         }
 
-        stage('Docker Pull') {
+        stage('Docker Login') {
 
             steps {
 
-                bat 'docker pull %DOCKER_HUB%/%IMAGE_NAME% || exit 0'
+                withCredentials([usernamePassword(
+
+                    credentialsId: 'docker-creds',
+
+                    usernameVariable: 'DOCKER_USER',
+
+                    passwordVariable: 'DOCKER_PASS'
+
+                )]) {
+
+                    bat 'docker login -u %DOCKER_USER% -p %DOCKER_PASS%'
+
+                }
 
             }
 
         }
 
-        stage('Remove Old Container') {
+        stage('Build Backend Image') {
 
             steps {
 
-                bat 'docker rm -f %CONTAINER_NAME% || exit 0'
+                bat 'docker build -t %BACKEND_IMAGE% ./backend'
 
             }
 
         }
 
-        stage('Build Docker Image') {
+        stage('Push Backend Image') {
 
             steps {
 
-                bat 'docker build -t %IMAGE_NAME% ./backend'
+                bat 'docker push %BACKEND_IMAGE%'
 
             }
 
         }
 
-        stage('Run Docker Container') {
+        stage('Pull Latest Image') {
 
             steps {
 
-                bat 'docker run -d -p 5000:5000 --name %CONTAINER_NAME% %IMAGE_NAME%'
+                bat 'docker pull %BACKEND_IMAGE%'
+
+            }
+
+        }
+
+        stage('Stop Old Container') {
+
+            steps {
+
+                bat 'docker stop %BACKEND_CONTAINER% || exit 0'
+
+                bat 'docker rm %BACKEND_CONTAINER% || exit 0'
+
+            }
+
+        }
+
+        stage('Run Backend Container') {
+
+            steps {
+
+                bat '''
+                docker run -d -p 5000:5000 ^
+                --name %BACKEND_CONTAINER% ^
+                %BACKEND_IMAGE%
+                '''
 
             }
 
@@ -69,17 +105,17 @@ pipeline {
 
             steps {
 
-                bat 'docker logs %CONTAINER_NAME%'
+                bat 'docker logs %BACKEND_CONTAINER% || exit 0'
 
             }
 
         }
 
-        stage('Docker Copy') {
+        stage('Docker Copy Files') {
 
             steps {
 
-                bat 'docker cp %CONTAINER_NAME%:/app/server.js server-copy.js'
+                bat 'docker cp %BACKEND_CONTAINER%:/app/server.js . || exit 0'
 
             }
 
@@ -95,21 +131,23 @@ pipeline {
 
         }
 
-        stage('Docker Tag') {
+        stage('Check Running Containers') {
 
             steps {
 
-                bat 'docker tag %IMAGE_NAME% %DOCKER_HUB%/%IMAGE_NAME%'
+                bat 'docker ps'
 
             }
 
         }
 
-        stage('Docker Push') {
+        stage('Debug Containers') {
 
             steps {
 
-                bat 'docker push %DOCKER_HUB%/%IMAGE_NAME%'
+                bat 'docker ps -a'
+
+                bat 'docker logs %BACKEND_CONTAINER% || exit 0'
 
             }
 
@@ -131,13 +169,13 @@ pipeline {
 
         success {
 
-            echo '✅ Pipeline completed successfully'
+            echo '✅ VANADIUM Backend CI/CD Pipeline Completed Successfully'
 
         }
 
         failure {
 
-            echo '❌ Pipeline failed'
+            echo '❌ VANADIUM Backend Pipeline Failed'
 
         }
 
