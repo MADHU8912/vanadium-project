@@ -92,7 +92,7 @@ pipeline {
             steps {
 
                 bat '''
-                docker run -d -p 5000:5000 ^
+                docker run -d -p 5001:5000 ^
                 --name %BACKEND_CONTAINER% ^
                 %BACKEND_IMAGE%
                 '''
@@ -125,7 +125,7 @@ pipeline {
 
             steps {
 
-                bat 'curl http://localhost:5000/health'
+                bat 'curl http://localhost:5001/health'
 
             }
 
