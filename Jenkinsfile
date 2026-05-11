@@ -153,6 +153,36 @@ pipeline {
 
         }
 
+        stage('Docker Error Debug') {
+
+            steps {
+
+                bat 'echo ===== DOCKER IMAGES ====='
+
+                bat 'docker images'
+
+                bat 'echo ===== RUNNING CONTAINERS ====='
+
+                bat 'docker ps'
+
+                bat 'echo ===== ALL CONTAINERS ====='
+
+                bat 'docker ps -a'
+
+                bat 'echo ===== BACKEND LOGS ====='
+
+                bat 'docker logs %BACKEND_CONTAINER% || exit 0'
+
+                bat 'echo ===== PORT CHECK ====='
+
+                bat 'netstat -ano | findstr :5000 || exit 0'
+
+                bat 'netstat -ano | findstr :5001 || exit 0'
+
+            }
+
+        }
+
         stage('Deploy To Render') {
 
             steps {
