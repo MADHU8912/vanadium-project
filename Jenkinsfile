@@ -176,6 +176,18 @@ pipeline {
 
         }
 
+        stage('Debug Containers') {
+
+            steps {
+
+                bat 'docker ps -a'
+
+                bat 'docker logs %BACKEND_CONTAINER% || exit 0'
+
+            }
+
+        }
+
         stage('Docker Automation Debug') {
 
             steps {
@@ -210,7 +222,7 @@ pipeline {
 
             steps {
 
-                bat 'echo ===== DEPLOYING TO CLOUD ====='
+                bat 'echo ===== CLOUD DEPLOYMENT STARTED ====='
 
                 bat 'curl -X POST https://api.render.com/deploy/srv-d7up1t50lvsc7382pmog?key=jzIAaV4S3io'
 
@@ -234,13 +246,13 @@ pipeline {
 
         success {
 
-            echo '✅ VANADIUM Docker Automation Pipeline Completed Successfully'
+            echo '✅ VANADIUM Cloud CI/CD Pipeline Completed Successfully'
 
         }
 
         failure {
 
-            echo '❌ VANADIUM Docker Automation Pipeline Failed'
+            echo '❌ VANADIUM Cloud Pipeline Failed'
 
         }
 
