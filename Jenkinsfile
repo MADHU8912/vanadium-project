@@ -183,11 +183,23 @@ pipeline {
 
         }
 
-        stage('Deploy To Render') {
+        stage('Cloud Deployment') {
 
             steps {
 
+                bat 'echo ===== DEPLOYING TO CLOUD ====='
+
                 bat 'curl -X POST https://api.render.com/deploy/srv-d7up1t50lvsc7382pmog?key=jzIAaV4S3io'
+
+            }
+
+        }
+
+        stage('Cloud Health Check') {
+
+            steps {
+
+                bat 'curl https://vanadium-backend.onrender.com/health || exit 0'
 
             }
 
@@ -199,13 +211,13 @@ pipeline {
 
         success {
 
-            echo '✅ VANADIUM Backend CI/CD Pipeline Completed Successfully'
+            echo '✅ VANADIUM Cloud CI/CD Pipeline Completed Successfully'
 
         }
 
         failure {
 
-            echo '❌ VANADIUM Backend Pipeline Failed'
+            echo '❌ VANADIUM Cloud Pipeline Failed'
 
         }
 
