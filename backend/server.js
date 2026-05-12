@@ -1,14 +1,8 @@
 const express = require("express");
-const cors = require("cors");
 
 const app = express();
 
-app.use(cors());
-
 app.use(express.json());
-
-
-// Home Route
 
 app.get("/", (req, res) => {
 
@@ -16,37 +10,21 @@ app.get("/", (req, res) => {
 
 });
 
-
-// Monitoring Status Route
-
-app.get("/api/status", (req, res) => {
-
-    res.json({
-
-        backend: "Running",
-
-        docker: "Active",
-
-        jenkins: "Connected",
-
-        githubActions: "Working"
-
-    });
-
-});
-
-
-
 app.get("/health", (req, res) => {
 
     res.status(200).json({
 
-        status: "OK"
+        status: "OK",
+
+        app: "Vanadium",
+
+        docker: "Running",
+
+        deployment: "Cloudflare"
 
     });
 
 });
-
 
 const PORT = 5000;
 
