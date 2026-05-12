@@ -2,11 +2,19 @@ pipeline {
 
     agent any
 
+    triggers {
+
+        githubPush()
+
+    }
+
     environment {
 
         BACKEND_IMAGE = "nikhilabba12/vanadium-backend"
 
         BACKEND_CONTAINER = "vanadium-backend"
+
+        DOCKER_BUILDKIT = "1"
 
     }
 
@@ -45,11 +53,35 @@ pipeline {
 
         }
 
+        stage('Docker Automation Info') {
+
+            steps {
+
+                bat 'echo ===== DOCKER AUTOMATION STARTED ====='
+
+                bat 'docker version'
+
+                bat 'docker info'
+
+            }
+
+        }
+
         stage('Build Backend Image') {
 
             steps {
 
                 bat 'docker build -t %BACKEND_IMAGE% ./backend'
+
+            }
+
+        }
+
+        stage('Automatic Docker Tag') {
+
+            steps {
+
+                bat 'docker tag %BACKEND_IMAGE% %BACKEND_IMAGE%:latest'
 
             }
 
@@ -61,11 +93,13 @@ pipeline {
 
                 bat 'docker push %BACKEND_IMAGE%'
 
+                bat 'docker push %BACKEND_IMAGE%:latest'
+
             }
 
         }
 
-        stage('Pull Latest Image') {
+        stage('Automatic Docker Pull') {
 
             steps {
 
@@ -93,6 +127,7 @@ pipeline {
 
                 bat '''
                 docker run -d -p 5001:5000 ^
+                --restart always ^
                 --name %BACKEND_CONTAINER% ^
                 %BACKEND_IMAGE%
                 '''
@@ -121,7 +156,7 @@ pipeline {
 
         }
 
-        stage('Health Check') {
+        stage('Local Health Check') {
 
             steps {
 
@@ -141,19 +176,7 @@ pipeline {
 
         }
 
-        stage('Debug Containers') {
-
-            steps {
-
-                bat 'docker ps -a'
-
-                bat 'docker logs %BACKEND_CONTAINER% || exit 0'
-
-            }
-
-        }
-
-        stage('Docker Error Debug') {
+        stage('Docker Automation Debug') {
 
             steps {
 
@@ -211,13 +234,19 @@ pipeline {
 
         success {
 
-            echo '✅ VANADIUM Cloud CI/CD Pipeline Completed Successfully'
+            echo '✅ VANADIUM Docker Automation Pipeline Completed Successfully'
 
         }
 
         failure {
 
-            echo '❌ VANADIUM Cloud Pipeline Failed'
+            echo '❌ VANADIUM Docker Automation Pipeline Failed'
+
+        }
+
+        always {
+
+            bat 'docker ps -a'
 
         }
 
